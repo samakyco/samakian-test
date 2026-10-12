@@ -101,9 +101,10 @@ h1.hero{font-family:var(--display);font-weight:800;font-size:clamp(46px,7vw,84px
 .q-count{font-size:14px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
 .bar{height:8px;border-radius:999px;background:var(--sunk);overflow:hidden}
 .bar>span{display:block;height:100%;background:var(--green);border-radius:999px;transition:width .35s ease}
-.q-card{margin-top:22px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:40px 36px 36px}
+.q-card{min-height:384px;display:flex;flex-direction:column;margin-top:22px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:40px 36px 36px}
 .q-text{font-family:var(--display);font-size:clamp(25px,4vw,32px);font-weight:700;line-height:1.2;letter-spacing:-.015em;margin:0 0 30px;text-wrap:balance}
 .q-help{font-size:15px;color:var(--muted);margin:-18px 0 24px}
+.q-card>.scale,.q-card>.choices,.q-card>.chips{margin-top:auto}
 .scale{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
 .dot{aspect-ratio:1;width:100%;max-width:62px;justify-self:center;border-radius:50%;border:2px solid var(--line);background:var(--bg);cursor:pointer;font-weight:700;font-size:18px;font-variant-numeric:tabular-nums;transition:all .15s ease}
 .dot:hover{border-color:var(--green)}
@@ -121,7 +122,7 @@ h1.hero{font-family:var(--display);font-weight:800;font-size:clamp(46px,7vw,84px
 .q-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:26px;flex-wrap:wrap}
 
 /* quiz progress with MAKY */
-.qprog{margin-top:30px;padding-inline:20px}
+.qprog{margin-top:56px;padding-inline:20px}
 .qprog-track{position:relative;height:10px;border-radius:999px;background:var(--sunk)}
 .qprog-tick{position:absolute;top:50%;width:6px;height:6px;border-radius:50%;background:color-mix(in srgb,var(--muted) 35%,transparent);transform:translate(-50%,-50%)}
 .qprog-tick.done{background:var(--on-green);opacity:.8}
@@ -266,7 +267,11 @@ h1.hero{font-family:var(--display);font-weight:800;font-size:clamp(46px,7vw,84px
   .hq-cell .gem{width:8px;height:8px;margin-right:5px}
   .house-tile{--mh:24px;padding:18px 16px 16px;gap:10px}
   .tile-line{font-size:14px}
-  .q-card{padding:28px 18px 24px}
+  .q-card{padding:28px 18px 24px;min-height:492px}
+  .q-card .chips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .chip{padding:8px 10px;min-height:42px;font-size:15px}
+  .q-card .q-foot .hint{display:none}
+  .q-foot{margin-top:20px}
   .scale{gap:5px}
   .dot{font-size:16px}
   .card{padding:22px 18px}
@@ -304,7 +309,6 @@ h1.hero{font-family:var(--display);font-weight:800;font-size:clamp(46px,7vw,84px
       <span class="logo" role="img" aria-label="Samaky"></span><span class="beta">Beta</span>
     </a>
     <nav class="nav">
-      <button class="top-link" type="button" id="nav-houses">The Houses</button>
       <a class="top-link" href="https://app.samaky.co" target="_blank" rel="noopener">Open Samaky</a>
     </nav>
   </div>
@@ -350,7 +354,7 @@ h1.hero{font-family:var(--display);font-weight:800;font-size:clamp(46px,7vw,84px
       <div class="q-card" id="q-card" aria-live="polite"></div>
       <div class="qprog" aria-hidden="true">
         <div class="qprog-track" id="qp-track"><span class="qprog-fill" id="qp-fill"></span><span class="maky qprog-maky" id="qp-maky"></span></div>
-        <div class="qprog-ends"><span>Start</span><span>Your House</span></div>
+        <div class="qprog-ends"><span>Start</span><span>Finish</span></div>
       </div>
     </div>
   </section>
@@ -499,7 +503,7 @@ function renderHouses(){
     sec.style.setProperty("--h",`var(--${k})`);
     const left=document.createElement("div");
     left.append(markEl(k));
-    left.insertAdjacentHTML("beforeend",`<div class="gemline"><span class="gem"></span>${H.gem} · ${H.word} · ${H.flower}</div>
+    left.insertAdjacentHTML("beforeend",`<div class="gemline"><span class="gem"></span>${H.gem} · ${H.word}</div>
       <p class="meaning-root">${H.root}</p><p class="meaning-line">${H.line}</p>`);
     const right=document.createElement("div"); right.className="types2";
     const tabs=document.createElement("div"); tabs.className="ttabs"; tabs.setAttribute("role","tablist"); tabs.setAttribute("aria-label",`${H.name} personality types`);
@@ -876,7 +880,6 @@ $("#houses-start").onclick=startQuiz;
 $("#houses-back").onclick=()=>show("result");
 $("#back").onclick=()=>go(-1);
 $("#home-link").onclick=e=>{e.preventDefault();$("#houses-back").hidden=!result;show("landing");};
-$("#nav-houses").onclick=()=>openHouses();
 renderLanding();
 renderHouses();
 (async()=>{
