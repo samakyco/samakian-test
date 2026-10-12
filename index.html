@@ -46,6 +46,8 @@ a{color:var(--green-ink)}
 .beta{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:var(--yellow);color:#1A1A1A}
 .nav{display:flex;gap:20px;align-items:center}
 .top-link{white-space:nowrap;font-weight:600;font-size:15px;text-decoration:none;color:var(--muted);background:none;border:0;cursor:pointer;padding:6px 0}
+.ext{display:inline-block;font-size:.95em;transition:transform .15s ease}
+.top-link:hover .ext{transform:translate(2px,-2px)}
 .top-link:hover,.top-link[aria-current="page"]{color:var(--ink)}
 
 /* wordmarks + MAKY */
@@ -309,7 +311,7 @@ h1.hero{font-family:var(--display);font-weight:800;font-size:clamp(46px,7vw,84px
       <span class="logo" role="img" aria-label="Samaky"></span><span class="beta">Beta</span>
     </a>
     <nav class="nav">
-      <a class="top-link" href="https://app.samaky.co" target="_blank" rel="noopener">Open Samaky</a>
+      <a class="top-link" href="https://app.samaky.co" target="_blank" rel="noopener" aria-label="Open Samaky (opens in a new tab)">Open Samaky <span class="ext" aria-hidden="true">↗</span></a>
     </nav>
   </div>
 </header>
@@ -704,7 +706,7 @@ function renderResult(){
 
   // 9. Actions
   const act=document.createElement("article"); act.className="card actions o9";
-  act.innerHTML=`<a class="btn btn-primary" href="https://app.samaky.co" target="_blank" rel="noopener">Save my House to my Samakian profile</a>
+  act.innerHTML=`<a class="btn btn-primary" href="https://app.samaky.co" target="_blank" rel="noopener">Save to my profile</a>
     <div class="row">
       <button class="btn btn-ghost" type="button" id="copy">Copy my result</button>
       <button class="btn btn-ghost" type="button" id="retake">Retake the quiz</button>
