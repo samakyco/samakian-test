@@ -501,8 +501,7 @@ function renderHouses(){
     sec.style.setProperty("--h",`var(--${k})`); sec.style.setProperty("--hi",`var(--${k}-ink)`);
     const left=document.createElement("div");
     left.append(markEl(k));
-    left.insertAdjacentHTML("beforeend",`<div class="gemline"><span class="gem"></span>${H.gem} · ${H.word}</div>
-      <p class="meaning-root">${H.root}</p><p class="meaning-line">${H.line}</p>`);
+    left.insertAdjacentHTML("beforeend",`<p class="meaning-root">${H.root}</p><p class="meaning-line">${H.line}</p>`);
     const right=document.createElement("div"); right.className="types2";
     const tabs=document.createElement("div"); tabs.className="ttabs"; tabs.setAttribute("role","tablist"); tabs.setAttribute("aria-label",`${H.name} personality types`);
     right.append(tabs);
