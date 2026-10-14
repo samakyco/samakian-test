@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0WYH01E4D4"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-0WYH01E4D4");</script>
 <meta name="color-scheme" content="light only">
 <meta name="description" content="Find your Samaky House: a 9-question volunteer personality quiz.">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
@@ -306,7 +309,7 @@ h1.hero{font-family:var(--display);font-weight:800;font-size:clamp(46px,7vw,84px
       <span class="logo" role="img" aria-label="Samaky"></span><span class="beta">Beta</span>
     </a>
     <nav class="nav">
-      <a class="top-link" href="https://app.samaky.co" target="_blank" rel="noopener" aria-label="Open Samaky (opens in a new tab)">Open Samaky <span class="ext" aria-hidden="true">↗</span></a>
+      <a class="top-link" href="https://app.samaky.co" target="_blank" rel="noopener" id="open-samaky" aria-label="Open Samaky (opens in a new tab)">Open Samaky <span class="ext" aria-hidden="true">↗</span></a>
     </nav>
   </div>
 </header>
@@ -338,6 +341,7 @@ h1.hero{font-family:var(--display);font-weight:800;font-size:clamp(46px,7vw,84px
       <button class="btn btn-primary" type="button" id="houses-start">Find my House</button>
       <button class="btn btn-ghost" type="button" id="houses-back" hidden>Back to my result</button>
     </div>
+    <p class="hint" style="margin-top:28px">We collect anonymous usage data to improve this quiz. We never ask for your name or email.</p>
     </section>
   </section>
 
@@ -449,6 +453,7 @@ let answers = {}, step = 0, result = null, plan = null, cameFromResult = false;
 let downloads = null, shareBlob = null, shareUrl = null, shareJob = 0;
 
 const $ = s => document.querySelector(s);
+function track(name,params){ try{ if(typeof window.gtag==="function") window.gtag("event",name,params||{}); }catch(e){} }
 const an = w => /^[AEIOU]/.test(w) ? "an" : "a";
 const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const views = ["landing","quiz","loading","result"];
@@ -519,6 +524,7 @@ function renderHouses(){
   });
 }
 function openHouses(focus){
+  if(focus) track("house_view",{house:HOUSES[focus].name});
   $("#houses-back").hidden = !result;
   show("landing");
   const el = focus ? $("#house-"+focus) : $("#houses");
@@ -593,14 +599,18 @@ function advanceSoon(){clearTimeout(advTimer); advTimer=setTimeout(()=>go(1),260
 function go(d){
   const n = step+d;
   if(n<0){show("landing");return;}
+  if(d>0){ const q=QUESTIONS[step]; track("question_answered",{question_number:step+1,question_id:q.id}); }
   if(n>=QUESTIONS.length){finish();return;}
   step=n; renderQuestion();
 }
-function startQuiz(){answers={};step=0;plan=null;renderQuestion();show("quiz");}
+function startQuiz(source){answers={};step=0;plan=null;renderQuestion();show("quiz");track("quiz_start",{source:typeof source==="string"?source:"button"});}
 function finish(){
   show("loading");
   const wait = matchMedia("(prefers-reduced-motion: reduce)").matches ? 400 : 1800;
-  setTimeout(()=>{result=score(answers); plan=null; renderResult(); show("result");},wait);
+  setTimeout(()=>{result=score(answers); plan=null; renderResult(); show("result");
+    const ty=typeFor(result.house,answers);
+    track("quiz_complete",{house:HOUSES[result.house].name,archetype:TYPES[ty].name,twin_houses:result.tied.length>1?"yes":"no",time_available:answers.q9||"",causes:(answers.q8||[]).join(", ")});
+  },wait);
 }
 
 /* ---------- Scoring ---------- */
@@ -701,7 +711,7 @@ function renderResult(){
 
   // 9. Actions
   const act=document.createElement("article"); act.className="card actions o9";
-  act.innerHTML=`<a class="btn btn-primary" href="https://app.samaky.co" target="_blank" rel="noopener">Save to my profile</a>
+  act.innerHTML=`<a class="btn btn-primary" id="save-profile" href="https://app.samaky.co" target="_blank" rel="noopener">Save to my profile</a>
     <div class="row">
       <button class="btn btn-ghost" type="button" id="copy">Copy my result</button>
       <button class="btn btn-ghost" type="button" id="retake">Retake the quiz</button>
@@ -760,8 +770,11 @@ function renderResult(){
   renderCommit(opps,a);
 
   $("#see-houses").onclick=()=>{cameFromResult=true; openHouses(house);};
-  $("#retake").onclick=startQuiz;
+  $("#retake").onclick=()=>{track("retake_quiz",{house:H.name}); startQuiz("retake");};
+  $("#save-profile").addEventListener("click",()=>track("save_profile_click",{house:H.name,archetype:T.name}));
+  el.querySelectorAll(".opp a").forEach((lnk,i)=>lnk.addEventListener("click",()=>track("join_samaky_click",{organization:opps[i].org,role:opps[i].role,cause:opps[i].cause,archetype:T.name})));
   $("#copy").onclick=async()=>{
+    track("copy_result",{house:H.name,archetype:T.name});
     const text=`I'm ${/^[AEIOU]/.test(T.name)?"an":"a"} ${T.name} in the House of ${H.name} (${H.gem} · ${H.word}). ${H.line} Find your House on Samaky.`;
     const t=$("#toast");
     try{await navigator.clipboard.writeText(text); t.textContent="Copied. Paste it anywhere to share.";}
@@ -804,7 +817,7 @@ function renderCommit(opps,a){
   opps.forEach((o,i)=>{const b=document.createElement("button");b.type="button";b.id=`plan-opp-${i}`;b.innerHTML=`${esc(o.role)}<small>${esc(o.org)}</small>`;b.onclick=()=>{draft.opp=i;sync();};po.append(b);});
   DAYS.forEach(d=>{const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=d;b.dataset.v=d;b.id=`plan-day-${d}`;b.setAttribute("aria-label",DAYS_LONG[d]);b.onclick=()=>{draft.day=d;sync();};pd.append(b);});
   SLOTS.forEach((s,i)=>{const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=s;b.dataset.v=s;b.id=`plan-slot-${i}`;b.onclick=()=>{draft.slot=s;sync();};ps.append(b);});
-  lock.onclick=()=>{plan={...draft,locked:true}; renderCommit(opps,a);};
+  lock.onclick=()=>{plan={...draft,locked:true}; track("plan_locked",{day:draft.day,time:draft.slot,organization:opps[draft.opp].org}); renderCommit(opps,a);};
   sync();
 }
 
@@ -863,6 +876,7 @@ async function setupShare(house,type){
   if(downloads || plainWeb){ btn.hidden=false; hint.hidden=true; }
   {
     btn.onclick=async()=>{
+      track("save_image_click",{house});
       if(plainWeb){ const l=document.createElement("a"); l.href=shareUrl; l.download=fname; document.body.append(l); l.click(); l.remove(); toast.textContent="Saved."; return; }
       if(!downloads) return;
       try{ const r=await downloads.save({filename:`samaky-${house}-${TYPES[type].name.toLowerCase().replace(/\s+/g,"-")}.png`,data:shareBlob}); toast.textContent = r.status==="saved" ? "Saved." : ""; }
@@ -873,7 +887,8 @@ async function setupShare(house,type){
 
 /* ---------- Wiring ---------- */
 $("#start").onclick=startQuiz;
-$("#houses-start").onclick=startQuiz;
+$("#houses-start").onclick=()=>startQuiz("houses_section");
+$("#open-samaky").addEventListener("click",()=>track("open_samaky_click",{location:"header"}));
 $("#houses-back").onclick=()=>show("result");
 $("#back").onclick=()=>go(-1);
 $("#home-link").onclick=e=>{e.preventDefault();$("#houses-back").hidden=!result;show("landing");};
