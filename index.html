@@ -670,7 +670,7 @@ function renderResult(){
   hero.append(greet);
   hero.insertAdjacentHTML("beforeend",`<div class="label">Your House</div>`);
   hero.append(markEl(house));
-  hero.insertAdjacentHTML("beforeend",`<p class="type-name">${T.name}</p><div class="gemline"><span class="gem"></span>${H.gem} · ${H.word} · ${H.flower}</div>`);
+  hero.insertAdjacentHTML("beforeend",`<p class="type-name">${T.name}</p><div class="gemline"><span class="gem"></span>${H.gem} · ${H.word}</div>`);
   if(r.tied.length>1){
     const tw=document.createElement("div"); tw.className="twin";
     tw.innerHTML=`<b>Twin Houses.</b> You scored the same for ${r.tied.map(k=>HOUSES[k].name).join(" and ")}. Tap the one that feels most like you.`;
@@ -853,7 +853,7 @@ async function drawShare(house,type){
   const tw=Math.min(860,MARKS[house].w*1.0), th=tw*MARKS[house].h/MARKS[house].w;
   x.drawImage(tinted(mark,PRINT_INK[house],Math.round(tw),Math.round(th)),(W-tw)/2,690,tw,th);
   x.font="800 124px Outfit, system-ui, sans-serif"; x.fillStyle=PRINT_INK[house]; x.fillText(T.name,W/2,1010);
-  x.font="700 44px Outfit, system-ui, sans-serif"; x.fillStyle=col; x.fillText(`${H.gem} · ${H.word} · ${H.flower}`,W/2,1090);
+  x.font="700 44px Outfit, system-ui, sans-serif"; x.fillStyle=col; x.fillText(`${H.gem} · ${H.word}`,W/2,1090);
   x.font="italic 500 54px Fraunces, Georgia, serif"; x.fillStyle="#1A1A1A";
   wrapText(x,`“${T.desc}”`,W/2,1330,860,74);
   // footer
